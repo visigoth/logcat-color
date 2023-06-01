@@ -2,7 +2,7 @@
 
 import base64
 import collections
-import httplib
+import http.client
 import json
 import mimetypes
 import os
@@ -31,7 +31,7 @@ class ReleaseCommand(object):
         self.tarball = os.path.join(dist_dir, self.tarball_name)
 
     def run(self, *args):
-        print "-> %s" % " ".join(args)
+        print("-> %s" % " ".join(args))
         return subprocess.check_output(args)
 
     def read_access_token(self):
@@ -40,7 +40,7 @@ class ReleaseCommand(object):
 
     def github_api(self, path, data):
         body = json.dumps(data)
-        connection = httplib.HTTPSConnection("api.github.com")
+        connection = http.client.HTTPSConnection("api.github.com")
         auth = base64.encodestring('%s:%s' % (self.access_token, 'x-oauth-basic')).replace('\n', '')
         connection.request("POST", path, body, {
             "Authorization": "Basic %s" % auth,
@@ -52,9 +52,9 @@ class ReleaseCommand(object):
 
         data = json.loads(response_body)
         if "errors" in data:
-            print >>sys.stderr, "Github Response Failed: %s" % data["message"]
+            print("Github Response Failed: %s" % data["message"], file=sys.stderr)
             for error in data["errors"]:
-                print >>sys.stderr, "    Error: %s\n" % error["code"]
+                print("    Error: %s\n" % error["code"], file=sys.stderr)
         return data
 
     def github_upload(self):
@@ -68,7 +68,7 @@ class ReleaseCommand(object):
             "body": description,
         })
 
-        print data
+        print(data)
 
         upload_url = data["upload_url"].replace("{?name}", "?name=%s" % self.tarball_name)
 
@@ -79,33 +79,33 @@ class ReleaseCommand(object):
             upload_url)
 
     def help(self):
-        print """
+        print("""
 Usage: %s <command> [args]
 Supported commands:
     help            view this help message
     build           build source distribution tarball
     push            push the release tarball to github and pypi, and push git tags
     bump [version]  bump to [version] in setup.json, stage, and prepare a commit message
-""" % sys.argv[0]
+""" % sys.argv[0])
 
     def build(self):
         # build sdist
         self.run(sys.executable, setup_py, "sdist")
 
-        print "%s succesfully built. to tag, use %s tag\n" % \
-            (self.tarball_name, sys.argv[0])
+        print("%s succesfully built. to tag, use %s tag\n" % \
+            (self.tarball_name, sys.argv[0]))
 
     def push(self):
         # upload source tarball->github, and setup.py upload for pypi
         self.github_upload()
         self.run(sys.executable, setup_py, "sdist", "upload")
 
-        print "%s successfully uploaded, and v%s tag pushed. to bump, use %s bump\n" % \
-            (self.tarball_name, self.package["version"], sys.argv[0])
+        print("%s successfully uploaded, and v%s tag pushed. to bump, use %s bump\n" % \
+            (self.tarball_name, self.package["version"], sys.argv[0]))
 
     def bump(self):
         if len(sys.argv) < 3:
-            print >>sys.stderr, "Error: bump requires a version to bump to"
+            print("Error: bump requires a version to bump to", file=sys.stderr)
             sys.exit(1)
 
         bump_version = sys.argv[2]

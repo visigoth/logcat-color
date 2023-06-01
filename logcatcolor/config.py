@@ -27,7 +27,7 @@ class LogcatColorConfig(object):
         if os.path.exists(self.path) and os.path.isfile(self.path):
             # config file is just a python script that globals are imported from
             try:
-                execfile(self.path, self.config)
+                exec(compile(open(self.path, "rb").read(), self.path, 'exec'), self.config)
             except:
                 self.report_config_error()
                 sys.exit(1)
@@ -43,10 +43,10 @@ class LogcatColorConfig(object):
 
 %(error)s"""
 
-        print >>sys.stderr, config_error % {
+        print(config_error % {
             "path": self.path,
             "error": traceback.format_exc()
-        }
+        }, file=sys.stderr)
 
     def get_default_config(self):
         env_key = "HOME"

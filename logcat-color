@@ -208,16 +208,15 @@ class LogcatColor(object):
         adb_command.extend(self.get_logcat_args())
         try:
             self.input = Popen(adb_command, stdout=PIPE).stdout
-        except OSError, e:
+        except OSError as e:
             if e.errno == errno.ENOENT:
-                print >>sys.stderr, \
-                    'Error, adb could not be found using: "%s"\n' \
+                print('Error, adb could not be found using: "%s"\n' \
                     'To fix this: \n' \
                     '  1) Add the directory containing adb to your PATH\n' \
                     '  2) Set the ADB environment variable\n' \
-                    '  3) Set "adb" in ~/.logcat-color' % adb_command[0]
+                    '  3) Set "adb" in ~/.logcat-color' % adb_command[0], file=sys.stderr)
             else:
-                print >>sys.stderr, 'Could not run ADB: %s' % str(e)
+                print('Could not run ADB: %s' % str(e), file=sys.stderr)
             sys.exit(e.errno)
 
     def init_reader(self):
@@ -242,7 +241,7 @@ class LogcatColor(object):
                 self.wait_for_device()
                 self.start_logcat()
                 self.init_reader()
-        except KeyboardInterrupt, e:
+        except KeyboardInterrupt as e:
             pass
 
     WAIT_FOR_DEVICE = Fore.WHITE + Back.BLACK + Style.DIM + \
@@ -258,7 +257,7 @@ class LogcatColor(object):
         if self.adb_device:
             device_str = "\"%s\" " % self.adb_device
 
-        print self.WAIT_FOR_DEVICE % device_str
+        print(self.WAIT_FOR_DEVICE % device_str)
         check_call(command)
 
 if __name__ == "__main__":

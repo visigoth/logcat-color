@@ -32,7 +32,7 @@ class Format(object):
         if not match:
             return False
 
-        for name, value in match.groupdict().iteritems():
+        for name, value in match.groupdict().items():
             self.data[name] = value.strip()
         return True
 
@@ -130,7 +130,7 @@ def detect_format(lines):
         if Format.MARKER_REGEX.match(line):
             continue
 
-        for name, regex in Format.REGEXES.iteritems():
+        for name, regex in Format.REGEXES.items():
             if regex.match(line):
                 return name
 

@@ -8,7 +8,7 @@ Columns for displaying logcat log data
 """
 import colorama
 from colorama import Fore, Back, Style
-import StringIO
+import io
 
 colorama.init()
 
@@ -73,7 +73,7 @@ class TagColumn(Column):
             tag_colors = layout.profile.tag_colors
 
         self.tag_colors = tag_colors or {}
-        self.last_used = self.COLOR_MAP.values()[:]
+        self.last_used = list(self.COLOR_MAP.values())[:]
 
     # This will allocate a unique format for the given tag since we dont have
     # very many colors, we always keep track of the LRU
@@ -113,7 +113,7 @@ class PriorityColumn(Column):
     def __init__(self, layout):
         Column.__init__(self, layout)
         self.formats = {}
-        for priority in self.COLORS.keys():
+        for priority in list(self.COLORS.keys()):
             self.formats[priority] = self.COLORS[priority] + \
                 priority.center(self.width) + Style.RESET_ALL
 
@@ -134,7 +134,7 @@ class MessageColumn(Column):
         if not self.width:
             return message
 
-        messagebuf = StringIO.StringIO()
+        messagebuf = io.StringIO()
         current = 0
         while current < len(message):
             next = min(current + self.width, len(message))

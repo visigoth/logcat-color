@@ -8,7 +8,7 @@ Logcat I/O stream readers and helpers
 """
 import asyncore
 import asynchat
-from cStringIO import StringIO
+from io import StringIO
 import fcntl
 import inspect
 from logcatcolor.format import Format, detect_format
